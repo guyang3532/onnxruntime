@@ -38,7 +38,7 @@ class QLinearConv : public OpKernel {
  public:
   explicit QLinearConv(const OpKernelInfo& info) : OpKernel(info), conv_attrs_(info) {
     channels_last_ = (info.GetAttrOrDefault<int64_t>("channels_last", static_cast<int64_t>(0)) != 0);
-    const CPUExecutionProvider* ep = dynamic_cast<const CPUExecutionProvider*>(info.GetExecutionProvider());
+    const CPUExecutionProvider* ep = static_cast<const CPUExecutionProvider*>(info.GetExecutionProvider());
     use_fixed_point_requant_ = ep->UseFixedPointRequantOnARM64();
   }
 

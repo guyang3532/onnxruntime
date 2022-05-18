@@ -548,9 +548,9 @@ class QLinearConvOpTester {
     }
 
     SessionOptions so;
-    so.config_options.AddConfigEntry(kOrtSessionOptionsConfigFixedPointRequantOnARM64,
-                                     requant_with_fixed_point_on_arm64 ? "1" : "0");
-    so.intra_op_param.thread_pool_size = 1;
+    ASSERT_STATUS_OK(so.config_options.AddConfigEntry(
+      kOrtSessionOptionsConfigFixedPointRequantOnARM64,
+      requant_with_fixed_point_on_arm64 ? "1" : "0"));
     test.Run(so, OpTester::ExpectResult::kExpectSuccess, "");
   }
 

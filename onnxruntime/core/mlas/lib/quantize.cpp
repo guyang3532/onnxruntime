@@ -404,7 +404,7 @@ MlasRequantizeOutput(
     )
 {
 
-MlasRequantRoundKind RequantRoundKind = RequantParam->RequantRoundKind;
+MLAS_ROUND_KIND RequantRoundKind = RequantParam->RequantRoundKind;
     if(RequantRoundKind == MLAS_ROUND_KIND::MlasRoundHalfUp) {
 #ifdef MLAS_NO_EXCEPTION
         abort();
@@ -1207,7 +1207,7 @@ MlasRequantizeOutput(
     size_t CountN
     )
 {
-    MlasRequantRoundKind RequantRoundKind = RequantParam->RequantRoundKind;
+    MLAS_ROUND_KIND RequantRoundKind = RequantParam->RequantRoundKind;
     if(RequantRoundKind == MLAS_ROUND_KIND::MlasRoundHalfUp) {
 #ifdef MLAS_NO_EXCEPTION
         abort();

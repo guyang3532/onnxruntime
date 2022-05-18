@@ -16,13 +16,13 @@ namespace onnxruntime {
 namespace test {
 
 TEST(InvokerTest, Basic) {
-  std::unique_ptr<IExecutionProvider> cpu_execution_provider = std::make_unique<CPUExecutionProvider>(CPUExecutionProviderInfo(false));
+  std::unique_ptr<IExecutionProvider> cpu_execution_provider = std::make_unique<CPUExecutionProvider>(CPUExecutionProviderInfo(false, false));
   const std::string logger_id{"InvokerTest"};
   auto logging_manager = std::make_unique<logging::LoggingManager>(
       std::unique_ptr<logging::ISink>{new logging::CLogSink{}},
       logging::Severity::kVERBOSE, false,
       logging::LoggingManager::InstanceType::Default,
-      &logger_id); 
+      &logger_id);
   std::unique_ptr<Environment> env;
   ASSERT_STATUS_OK(Environment::Create(std::move(logging_manager), env));
   IOnnxRuntimeOpSchemaRegistryList tmp_op_registry = {};
@@ -49,13 +49,13 @@ TEST(InvokerTest, Basic) {
 }
 
 TEST(InvokerTest, Inplace) {
-  std::unique_ptr<IExecutionProvider> cpu_execution_provider = std::make_unique<CPUExecutionProvider>(CPUExecutionProviderInfo(false));
+  std::unique_ptr<IExecutionProvider> cpu_execution_provider = std::make_unique<CPUExecutionProvider>(CPUExecutionProviderInfo(false, false));
   const std::string logger_id{"InvokerTest"};
   auto logging_manager = std::make_unique<logging::LoggingManager>(
       std::unique_ptr<logging::ISink>{new logging::CLogSink{}},
       logging::Severity::kVERBOSE, false,
       logging::LoggingManager::InstanceType::Default,
-      &logger_id); 
+      &logger_id);
   std::unique_ptr<Environment> env;
   ASSERT_STATUS_OK(Environment::Create(std::move(logging_manager), env));
   IOnnxRuntimeOpSchemaRegistryList tmp_op_registry = {};
@@ -93,7 +93,7 @@ Status CreateTestKernel(FuncManager&, const OpKernelInfo& info, std::unique_ptr<
 }
 
 TEST(InvokerTest, CustomOp) {
-  std::unique_ptr<IExecutionProvider> cpu_execution_provider = std::make_unique<CPUExecutionProvider>(CPUExecutionProviderInfo(false));
+  std::unique_ptr<IExecutionProvider> cpu_execution_provider = std::make_unique<CPUExecutionProvider>(CPUExecutionProviderInfo(false, false));
   // register "Test" kernel to "FakeDomain"
   auto kernel_registry = cpu_execution_provider->GetKernelRegistry();
   auto kernel_def = KernelDefBuilder()
@@ -121,7 +121,7 @@ TEST(InvokerTest, CustomOp) {
       std::unique_ptr<logging::ISink>{new logging::CLogSink{}},
       logging::Severity::kVERBOSE, false,
       logging::LoggingManager::InstanceType::Default,
-      &logger_id); 
+      &logger_id);
   std::unique_ptr<Environment> env;
   ASSERT_STATUS_OK(Environment::Create(std::move(logging_manager), env));
   ORTInvoker kernel_invoker(std::move(cpu_execution_provider), env->GetLoggingManager()->DefaultLogger(), regs);

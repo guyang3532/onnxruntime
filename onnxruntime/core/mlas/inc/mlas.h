@@ -874,7 +874,7 @@ MlasFloatToFixedPoint(
     int32_t* PostShift,
     size_t N)
 {
-    for(auto i = 0; i < N; i++) {
+    for(size_t i = 0; i < N; i++) {
         MlasFloatToFixedPoint(Scale[i], Multiplier[i], PreShift[i], PostShift[i]);
     }
 }
