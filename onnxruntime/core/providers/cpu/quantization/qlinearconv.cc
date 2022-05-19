@@ -522,6 +522,9 @@ Status QLinearConv<ActType>::Compute(OpKernelContext* context) const {
   std::vector<int32_t> multipliers;
   std::vector<int32_t> post_shifts;
   if (use_fixed_point_requant_) {
+    pre_shifts.resize(output_scales.size());
+    multipliers.resize(output_scales.size());
+    post_shifts.resize(output_scales.size());
     MlasFloatToFixedPoint(output_scales.data(),
                           multipliers.data(),
                           pre_shifts.data(),
