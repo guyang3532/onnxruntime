@@ -898,15 +898,9 @@ void OpTester::Run(
     const std::unordered_set<std::string>& excluded_provider_types,
     const RunOptions* run_options,
     std::vector<std::unique_ptr<IExecutionProvider>>* execution_providers,
-    ExecutionMode execution_mode,
     const Graph::ResolveOptions& options) {
   SessionOptions so;
-  so.use_per_session_threads = false;
-  so.session_logid = op_;
-  so.session_log_verbosity_level = 1;
-  so.execution_mode = execution_mode;
-  so.use_deterministic_compute = use_determinism_;
-  so.graph_optimization_level = TransformerLevel::Default;  // 'Default' == off
+  SetUpDefaultSessionOptions(so);
   Run(so, expect_result, expected_failure_string, excluded_provider_types,
       run_options, execution_providers, options);
 }

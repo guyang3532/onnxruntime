@@ -95,6 +95,22 @@ Status QLinearMatMul::Compute(OpKernelContext* ctx) const {
     output_scales[i] = (a_scale_data * b_scale_data[i] / y_scale_data);
   }
 
+  #if defined(_M_ARM64) || defined(__aarch64__)
+  std::vector<int32_t> pre_shifts;
+  std::vector<int32_t> multipliers;
+  std::vector<int32_t> post_shifts;
+  if (use_fixed_point_requant_) {
+    pre_shifts.resize(output_scales.size());
+    multipliers.resize(output_scales.size());
+    post_shifts.resize(output_scales.size());
+    MlasFloatToFixedPoint(output_scales.data(),
+                          multipliers.data(),
+                          pre_shifts.data(),
+                          post_shifts.data(),
+                          output_scales.size());
+  }
+#endif
+
   const size_t num_gemms = helper.OutputOffsets().size();
   MLAS_GEMM_QUANT_SHAPE_PARAMS gemm_shape;
   gemm_shape.M = static_cast<size_t>(helper.M());
@@ -134,10 +150,17 @@ Status QLinearMatMul::Compute(OpKernelContext* ctx) const {
 
     gemm_params[i].PerColumnZeroPoints = !IsScalarOr1ElementVector(b_offset);
 
-    requant_params[i].RequantRoundKind = MLAS_ROUND_KIND::MlasRoundHalfEven;
-    requant_params[i].Scale = output_scales.data() + helper.RightScaleOffsets()[i];
     requant_params[i].Size = output_scales.size();
     requant_params[i].ZeroPoint = output_offset;
+    if (use_fixed_point_requant_) {
+      requant_params[i].RequantRoundKind = MLAS_ROUND_KIND::MlasRoundHalfUp;
+      requant_params[i].Scale = output_scales.data() + helper.RightScaleOffsets()[i];
+    } else {
+      requant_params[i].RequantRoundKind = MLAS_ROUND_KIND::MlasRoundHalfEven;
+      requant_params[i].PreShift = pre_shifts.data() + helper.RightScaleOffsets()[i];
+      requant_params[i].Multiplier = multipliers.data() + helper.RightScaleOffsets()[i];
+      requant_params[i].PostShift = post_shifts.data() + helper.RightScaleOffsets()[i];
+    }
     requant_procs.emplace_back(static_cast<uint8_t*>(y->MutableDataRaw()) + helper.OutputOffsets()[i],
                                static_cast<size_t>(helper.N()),
                                nullptr,
