@@ -11,7 +11,7 @@ namespace onnxruntime {
 class QLinearMatMul : public MatMulIntegerBase {
  public:
   QLinearMatMul(const OpKernelInfo& info) : MatMulIntegerBase(info) {
-    const CPUExecutionProvider* ep = dynamic_cast<const CPUExecutionProvider*>(info.GetExecutionProvider());
+    const CPUExecutionProvider* ep = static_cast<const CPUExecutionProvider*>(info.GetExecutionProvider());
     use_fixed_point_requant_ = ep->UseFixedPointRequantOnARM64();
   }
 

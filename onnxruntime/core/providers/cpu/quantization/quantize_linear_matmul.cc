@@ -152,6 +152,7 @@ Status QLinearMatMul::Compute(OpKernelContext* ctx) const {
 
     requant_params[i].Size = output_scales.size();
     requant_params[i].ZeroPoint = output_offset;
+#if defined(_M_ARM64) || defined(__aarch64__)
     if (use_fixed_point_requant_) {
       requant_params[i].RequantRoundKind = MLAS_ROUND_KIND::MlasRoundHalfUp;
       requant_params[i].Scale = output_scales.data() + helper.RightScaleOffsets()[i];
@@ -161,6 +162,10 @@ Status QLinearMatMul::Compute(OpKernelContext* ctx) const {
       requant_params[i].Multiplier = multipliers.data() + helper.RightScaleOffsets()[i];
       requant_params[i].PostShift = post_shifts.data() + helper.RightScaleOffsets()[i];
     }
+#else
+    requant_params[i].RequantRoundKind = MLAS_ROUND_KIND::MlasRoundHalfUp;
+    requant_params[i].Scale = output_scales.data() + helper.RightScaleOffsets()[i];
+#endif
     requant_procs.emplace_back(static_cast<uint8_t*>(y->MutableDataRaw()) + helper.OutputOffsets()[i],
                                static_cast<size_t>(helper.N()),
                                nullptr,
